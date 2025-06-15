@@ -32,10 +32,12 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" className="hidden sm:inline-flex">
-            Sign In
+          <Button variant="ghost" className="hidden sm:inline-flex" asChild>
+            <a href="/signin">Sign In</a>
           </Button>
-          <Button>Get Started</Button>
+          <Button asChild>
+            <a href="/signup">Get Started</a>
+          </Button>
           <Button variant="ghost" size="icon" className="md:hidden">
             <Menu className="h-5 w-5" />
           </Button>
