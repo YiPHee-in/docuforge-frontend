@@ -6,24 +6,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Globe,
-  Download,
-  Settings,
-  Search,
-  Calendar,
-  RefreshCw,
-  ExternalLink,
-  MoreHorizontal,
-  Plus,
-} from "lucide-react"
+import { Globe, Download, Search, Calendar, RefreshCw, ExternalLink, MoreHorizontal, Plus, Eye } from "lucide-react"
 
 export function ProjectsList() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const projects = [
     {
-      id: "1",
+      id: "legacy-cobol-system",
       name: "Legacy COBOL System",
       description: "Main business application documentation",
       status: "active",
@@ -37,7 +27,7 @@ export function ProjectsList() {
       downloads: 89,
     },
     {
-      id: "2",
+      id: "api-gateway",
       name: "API Gateway Documentation",
       description: "Microservices API documentation",
       status: "active",
@@ -51,7 +41,7 @@ export function ProjectsList() {
       downloads: 34,
     },
     {
-      id: "3",
+      id: "perl-data-processor",
       name: "Perl Data Processor",
       description: "Legacy data transformation scripts",
       status: "updating",
@@ -132,7 +122,9 @@ export function ProjectsList() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold">{project.name}</h3>
+                      <a href={`/projects/${project.id}`} className="text-lg font-semibold hover:text-blue-600">
+                        {project.name}
+                      </a>
                       {getStatusBadge(project.status)}
                       <Badge variant="outline">{project.language}</Badge>
                     </div>
@@ -143,11 +135,20 @@ export function ProjectsList() {
                         Updated {project.lastUpdated}
                       </span>
                       <span>{project.lines.toLocaleString()} lines</span>
-                      <span>{project.views} views</span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="h-4 w-4" />
+                        {project.views} views
+                      </span>
                       <span>{project.downloads} downloads</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={`/projects/${project.id}`}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Details
+                      </a>
+                    </Button>
                     <Button variant="outline" size="sm">
                       <Globe className="mr-2 h-4 w-4" />
                       View Site
@@ -156,10 +157,6 @@ export function ProjectsList() {
                     <Button variant="outline" size="sm">
                       <Download className="mr-2 h-4 w-4" />
                       Download
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Settings className="mr-2 h-4 w-4" />
-                      Settings
                     </Button>
                     <Button variant="ghost" size="sm">
                       <MoreHorizontal className="h-4 w-4" />
