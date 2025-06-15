@@ -1,24 +1,12 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   FileText,
   Globe,
@@ -32,62 +20,10 @@ import {
   RefreshCw,
   ExternalLink,
   MoreHorizontal,
-} from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+} from "lucide-react"
 
 export function Dashboard() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [userInfo, setUserInfo] = useState<any>(null);
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    // Get the current session
-    const getSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error getting session:", error.message);
-        return;
-      }
-
-      if (session) {
-        console.log("User session:", {
-          user: session.user,
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-          expires_at: new Date(session.expires_at! * 1000).toLocaleString(),
-        });
-        setUserInfo(session.user);
-      }
-    };
-
-    getSession();
-
-    // Subscribe to auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        console.log("Auth state changed - Signed in:", {
-          user: session.user,
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-          expires_at: new Date(session.expires_at! * 1000).toLocaleString(),
-        });
-        setUserInfo(session.user);
-      } else if (event === "SIGNED_OUT") {
-        console.log("Auth state changed - Signed out");
-        setUserInfo(null);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("")
 
   const projects = [
     {
@@ -132,43 +68,34 @@ export function Dashboard() {
       views: 234,
       downloads: 12,
     },
-  ];
+  ]
 
   const stats = [
     { label: "Total Projects", value: "12", change: "+2", icon: FileText },
-    {
-      label: "Documentation Views",
-      value: "8.2K",
-      change: "+15%",
-      icon: TrendingUp,
-    },
+    { label: "Documentation Views", value: "8.2K", change: "+15%", icon: TrendingUp },
     { label: "Active Webhooks", value: "9", change: "100%", icon: RefreshCw },
     { label: "Team Members", value: "4", change: "+1", icon: Users },
-  ];
+  ]
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+        return <Badge className="bg-green-100 text-green-800">Active</Badge>
       case "updating":
-        return <Badge className="bg-blue-100 text-blue-800">Updating</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">Updating</Badge>
       case "error":
-        return <Badge className="bg-red-100 text-red-800">Error</Badge>;
+        return <Badge className="bg-red-100 text-red-800">Error</Badge>
       default:
-        return <Badge variant="secondary">Draft</Badge>;
+        return <Badge variant="secondary">Draft</Badge>
     }
-  };
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            Documentation Dashboard
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Manage your AI-generated documentation projects
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900">Documentation Dashboard</h1>
+          <p className="text-slate-600 mt-1">Manage your AI-generated documentation projects</p>
         </div>
         <Button onClick={() => (window.location.href = "/connect")}>
           <Plus className="mr-2 h-4 w-4" />
@@ -183,14 +110,10 @@ export function Dashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">
-                    {stat.label}
-                  </p>
+                  <p className="text-sm font-medium text-slate-600">{stat.label}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-2xl font-bold">{stat.value}</span>
-                    <span className="text-sm text-green-600">
-                      {stat.change}
-                    </span>
+                    <span className="text-sm text-green-600">{stat.change}</span>
                   </div>
                 </div>
                 <stat.icon className="h-8 w-8 text-slate-400" />
@@ -213,9 +136,7 @@ export function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Documentation Projects</CardTitle>
-                  <CardDescription>
-                    Manage your generated documentation sites
-                  </CardDescription>
+                  <CardDescription>Manage your generated documentation sites</CardDescription>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="relative">
@@ -244,22 +165,15 @@ export function Dashboard() {
             <CardContent>
               <div className="space-y-4">
                 {projects.map((project) => (
-                  <div
-                    key={project.id}
-                    className="border rounded-lg p-6 hover:shadow-md transition-shadow"
-                  >
+                  <div key={project.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold">
-                            {project.name}
-                          </h3>
+                          <h3 className="text-lg font-semibold">{project.name}</h3>
                           {getStatusBadge(project.status)}
                           <Badge variant="outline">{project.language}</Badge>
                         </div>
-                        <p className="text-slate-600 mb-3">
-                          {project.description}
-                        </p>
+                        <p className="text-slate-600 mb-3">{project.description}</p>
                         <div className="flex items-center gap-6 text-sm text-slate-500">
                           <span className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
@@ -292,9 +206,7 @@ export function Dashboard() {
 
                     <div className="flex items-center justify-between pt-4 border-t">
                       <div className="flex items-center gap-4 text-sm">
-                        <span className="text-slate-600">
-                          Repositories: {project.repositories.join(", ")}
-                        </span>
+                        <span className="text-slate-600">Repositories: {project.repositories.join(", ")}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1 text-sm text-slate-500">
@@ -314,9 +226,7 @@ export function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>
-                Latest updates and changes to your documentation
-              </CardDescription>
+              <CardDescription>Latest updates and changes to your documentation</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -343,26 +253,17 @@ export function Dashboard() {
                     icon: Download,
                   },
                 ].map((activity, index) => (
-                  <div
-                    key={index}
-                    className="flex items-start gap-4 p-4 border rounded-lg"
-                  >
+                  <div key={index} className="flex items-start gap-4 p-4 border rounded-lg">
                     <div className="p-2 bg-blue-100 rounded-lg">
                       <activity.icon className="h-4 w-4 text-blue-600" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <h4 className="font-medium">{activity.action}</h4>
-                        <span className="text-sm text-slate-500">
-                          {activity.time}
-                        </span>
+                        <span className="text-sm text-slate-500">{activity.time}</span>
                       </div>
-                      <p className="text-slate-600 text-sm mb-1">
-                        {activity.project}
-                      </p>
-                      <p className="text-slate-500 text-xs">
-                        {activity.details}
-                      </p>
+                      <p className="text-slate-600 text-sm mb-1">{activity.project}</p>
+                      <p className="text-slate-500 text-xs">{activity.details}</p>
                     </div>
                   </div>
                 ))}
@@ -389,22 +290,15 @@ export function Dashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Top Projects</CardTitle>
-                <CardDescription>
-                  Most viewed documentation sites
-                </CardDescription>
+                <CardDescription>Most viewed documentation sites</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {projects.slice(0, 3).map((project, index) => (
-                    <div
-                      key={project.id}
-                      className="flex items-center justify-between"
-                    >
+                    <div key={project.id} className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">{project.name}</p>
-                        <p className="text-sm text-slate-600">
-                          {project.views} views
-                        </p>
+                        <p className="text-sm text-slate-600">{project.views} views</p>
                       </div>
                       <Badge variant="secondary">#{index + 1}</Badge>
                     </div>
@@ -416,5 +310,5 @@ export function Dashboard() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }

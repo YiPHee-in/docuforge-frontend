@@ -1,11 +1,11 @@
 import { AuthenticatedHeader } from "@/components/authenticated-header"
-import { Dashboard } from "@/components/dashboard"
+import { UserProfile } from "@/components/user-profile"
 
-export default function DashboardPage() {
+export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       <AuthenticatedHeader />
-      <Dashboard />
+      <UserProfile />
     </div>
   )
 }

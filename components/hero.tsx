@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Github, GitBranch, FileText } from "lucide-react";
-import Link from "next/link";
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { ArrowRight, Github, GitBranch, FileText } from "lucide-react"
 
 export function Hero() {
   return (
@@ -24,8 +23,8 @@ export function Hero() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 sm:text-xl">
-            AI-powered documentation that evolves with your codebase. From COBOL
-            to modern APIs, generate beautiful docs in minutes, not months.
+            AI-powered documentation that evolves with your codebase. From COBOL to modern APIs, generate beautiful docs
+            in minutes, not months.
           </p>
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
@@ -33,12 +32,10 @@ export function Hero() {
               Start Free Trial
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Link href="/connect">
-              <Button variant="outline" size="lg" className="px-8 py-3 text-lg">
-                <Github className="mr-2 h-5 w-5" />
-                Connect Repository
-              </Button>
-            </Link>
+            <Button variant="outline" size="lg" className="px-8 py-3 text-lg">
+              <Github className="mr-2 h-5 w-5" />
+              Connect Repository
+            </Button>
           </div>
 
           <div className="mt-8 flex items-center justify-center gap-8 text-sm text-slate-500">
@@ -58,5 +55,5 @@ export function Hero() {
         </div>
       </div>
     </section>
-  );
+  )
 }

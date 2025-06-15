@@ -1,9 +1,9 @@
-import { Hero } from "@/components/hero";
-import { Features } from "@/components/features";
-import { Architecture } from "@/components/architecture";
-import { Pricing } from "@/components/pricing";
-import { Stats } from "@/components/stats";
-import { CTA } from "@/components/cta";
+import { Hero } from "@/components/hero"
+import { Features } from "@/components/features"
+import { Architecture } from "@/components/architecture"
+import { Pricing } from "@/components/pricing"
+import { Stats } from "@/components/stats"
+import { CTA } from "@/components/cta"
 
 export default function HomePage() {
   return (
@@ -15,5 +15,5 @@ export default function HomePage() {
       <Pricing />
       <CTA />
     </main>
-  );
+  )
 }
