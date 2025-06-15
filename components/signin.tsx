@@ -1,20 +1,34 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Checkbox } from "@/components/ui/checkbox"
-import { FileText, Github, GitBranch, Loader2, Shield, Zap } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  FileText,
+  Github,
+  GitBranch,
+  Loader2,
+  Shield,
+  Zap,
+} from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 export function SignIn() {
-  const [isLoading, setIsLoading] = useState<string | null>(null)
-  const [showEmailForm, setShowEmailForm] = useState(false)
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [showEmailForm, setShowEmailForm] = useState(false);
 
   const providers = [
     {
@@ -49,24 +63,38 @@ export function SignIn() {
       color: "bg-blue-500 hover:bg-blue-600",
       textColor: "text-white",
     },
-  ]
+  ];
 
   const handleOAuthSignIn = async (providerId: string) => {
-    setIsLoading(providerId)
-    // Simulate OAuth flow
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsLoading(null)
-    // Redirect to dashboard or connect page
-    window.location.href = "/dashboard"
-  }
+    setIsLoading(providerId);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: providerId as "github" | "gitlab" | "bitbucket" | "azure",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        console.error("OAuth error:", error.message);
+        // You might want to show an error toast here
+      }
+    } catch (error) {
+      console.error("Sign in error:", error);
+      // You might want to show an error toast here
+    } finally {
+      setIsLoading(null);
+    }
+  };
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading("email")
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setIsLoading(null)
-    window.location.href = "/dashboard"
-  }
+    e.preventDefault();
+    setIsLoading("email");
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setIsLoading(null);
+    window.location.href = "/dashboard";
+  };
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-md">
@@ -79,7 +107,9 @@ export function SignIn() {
           <Badge variant="secondary">4.1</Badge>
         </div>
         <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back</h1>
-        <p className="text-slate-600">Sign in to your account to continue generating documentation</p>
+        <p className="text-slate-600">
+          Sign in to your account to continue generating documentation
+        </p>
       </div>
 
       <Card>
@@ -133,11 +163,22 @@ export function SignIn() {
             <form onSubmit={handleEmailSignIn} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="name@company.com" required disabled={isLoading !== null} />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@company.com"
+                  required
+                  disabled={isLoading !== null}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required disabled={isLoading !== null} />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  disabled={isLoading !== null}
+                />
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox id="remember" disabled={isLoading !== null} />
@@ -145,7 +186,11 @@ export function SignIn() {
                   Remember me
                 </Label>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading !== null}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading !== null}
+              >
                 {isLoading === "email" ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -160,7 +205,12 @@ export function SignIn() {
 
           {showEmailForm && (
             <div className="text-center">
-              <Button variant="ghost" size="sm" onClick={() => setShowEmailForm(false)} disabled={isLoading !== null}>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowEmailForm(false)}
+                disabled={isLoading !== null}
+              >
                 Back to OAuth providers
               </Button>
             </div>
@@ -177,9 +227,12 @@ export function SignIn() {
                 <Shield className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-blue-900">Secure Authentication</h3>
+                <h3 className="font-semibold text-blue-900">
+                  Secure Authentication
+                </h3>
                 <p className="text-blue-800 text-sm mt-1">
-                  We use OAuth 2.0 for secure authentication. Your credentials are never stored on our servers.
+                  We use OAuth 2.0 for secure authentication. Your credentials
+                  are never stored on our servers.
                 </p>
               </div>
             </div>
@@ -195,7 +248,8 @@ export function SignIn() {
               <div>
                 <h3 className="font-semibold text-green-900">Instant Access</h3>
                 <p className="text-green-800 text-sm mt-1">
-                  Sign in once and automatically connect to all your repositories across different platforms.
+                  Sign in once and automatically connect to all your
+                  repositories across different platforms.
                 </p>
               </div>
             </div>
@@ -207,7 +261,10 @@ export function SignIn() {
       <div className="mt-8 text-center space-y-4">
         <div className="text-sm text-slate-600">
           Don't have an account?{" "}
-          <a href="/signup" className="text-blue-600 hover:text-blue-500 font-medium">
+          <a
+            href="/signup"
+            className="text-blue-600 hover:text-blue-500 font-medium"
+          >
             Sign up for free
           </a>
         </div>
@@ -231,5 +288,5 @@ export function SignIn() {
         </div>
       </div>
     </div>
-  )
+  );
 }

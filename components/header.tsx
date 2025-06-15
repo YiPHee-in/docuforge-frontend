@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { FileText, Menu } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { FileText, Menu } from "lucide-react";
+import Link from "next/link";
 
 export function Header() {
   return (
@@ -17,16 +18,28 @@ export function Header() {
         </div>
 
         <nav className="hidden md:flex items-center gap-6">
-          <a href="#features" className="text-sm font-medium hover:text-blue-600 transition-colors">
+          <a
+            href="#features"
+            className="text-sm font-medium hover:text-blue-600 transition-colors"
+          >
             Features
           </a>
-          <a href="#pricing" className="text-sm font-medium hover:text-blue-600 transition-colors">
+          <a
+            href="#pricing"
+            className="text-sm font-medium hover:text-blue-600 transition-colors"
+          >
             Pricing
           </a>
-          <a href="#docs" className="text-sm font-medium hover:text-blue-600 transition-colors">
+          <a
+            href="#docs"
+            className="text-sm font-medium hover:text-blue-600 transition-colors"
+          >
             Documentation
           </a>
-          <a href="#support" className="text-sm font-medium hover:text-blue-600 transition-colors">
+          <a
+            href="#support"
+            className="text-sm font-medium hover:text-blue-600 transition-colors"
+          >
             Support
           </a>
         </nav>
@@ -44,5 +57,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }
