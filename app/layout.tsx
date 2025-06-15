@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "DocuForge - AI-Powered Documentation for Legacy Systems",
   description:
     "Transform legacy code into living documentation. Generate beautiful docs from COBOL, Perl, and 25+ languages in minutes.",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
