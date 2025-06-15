@@ -13,23 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  FileText,
-  Plus,
-  Bell,
-  Settings,
-  User,
-  CreditCard,
-  LogOut,
-  Users,
-  Crown,
-  Search,
-  Menu,
-  Home,
-  BarChart3,
-  Webhook,
-  HelpCircle,
-} from "lucide-react"
+import { FileText, Plus, Bell, Settings, User, CreditCard, LogOut, Users, Crown, HelpCircle } from "lucide-react"
 
 export function AuthenticatedHeader() {
   const [notifications] = useState(3)
@@ -76,63 +60,23 @@ export function AuthenticatedHeader() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+      <div className="flex h-16 items-center justify-between px-6">
         {/* Logo and Brand */}
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-              <FileText className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-xl font-bold">DocuForge</span>
-            <Badge variant="secondary" className="ml-2">
-              4.1
-            </Badge>
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
+            <FileText className="h-5 w-5 text-white" />
           </div>
-
-          {/* Main Navigation */}
-          <nav className="hidden lg:flex items-center gap-6">
-            <a
-              href="/dashboard"
-              className="flex items-center gap-2 text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              <Home className="h-4 w-4" />
-              Dashboard
-            </a>
-            <a href="/projects" className="text-sm font-medium hover:text-blue-600 transition-colors">
-              Projects
-            </a>
-            <a
-              href="/analytics"
-              className="flex items-center gap-2 text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </a>
-            <a
-              href="/webhooks"
-              className="flex items-center gap-2 text-sm font-medium hover:text-blue-600 transition-colors"
-            >
-              <Webhook className="h-4 w-4" />
-              Webhooks
-            </a>
-          </nav>
+          <span className="text-xl font-bold">DocuForge</span>
+          <Badge variant="secondary" className="ml-2">
+            4.1
+          </Badge>
         </div>
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-4">
-          {/* Search */}
-          <div className="hidden md:flex relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search projects..."
-              className="pl-10 pr-4 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64"
-            />
-          </div>
-
           {/* Organization Selector */}
           <Select value={currentOrg} onValueChange={setCurrentOrg}>
-            <SelectTrigger className="w-48 hidden sm:flex">
+            <SelectTrigger className="w-48">
               <div className="flex items-center gap-2">
                 <Avatar className="h-5 w-5">
                   <AvatarImage src={currentOrgData?.avatar || "/placeholder.svg"} />
@@ -177,7 +121,7 @@ export function AuthenticatedHeader() {
           </Select>
 
           {/* Credits Display */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-200 rounded-md">
+          <div className="flex items-center gap-2 px-3 py-1 bg-green-50 border border-green-200 rounded-md">
             <CreditCard className="h-4 w-4 text-green-600" />
             <span className="text-sm font-medium text-green-800">{user.credits.toLocaleString()}</span>
             <span className="text-xs text-green-600">credits</span>
@@ -324,11 +268,6 @@ export function AuthenticatedHeader() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          {/* Mobile Menu */}
-          <Button variant="ghost" size="icon" className="lg:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
         </div>
       </div>
     </header>

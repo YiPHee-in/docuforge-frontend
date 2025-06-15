@@ -91,20 +91,14 @@ export function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Documentation Dashboard</h1>
-          <p className="text-slate-600 mt-1">Manage your AI-generated documentation projects</p>
-        </div>
-        <Button onClick={() => (window.location.href = "/connect")}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Project
-        </Button>
+    <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+        <p className="text-slate-600 mt-1">Overview of your documentation projects and activity</p>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid gap-6 md:grid-cols-4 mb-8">
+      <div className="grid gap-6 md:grid-cols-4">
         {stats.map((stat, index) => (
           <Card key={index}>
             <CardContent className="pt-6">
@@ -123,6 +117,49 @@ export function Dashboard() {
         ))}
       </div>
 
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Activity</CardTitle>
+          <CardDescription>Latest updates and changes to your documentation</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[
+              {
+                action: "Documentation updated",
+                project: "Legacy COBOL System",
+                time: "2 hours ago",
+                details: "Auto-updated from commit abc123f",
+                icon: RefreshCw,
+              },
+              {
+                action: "New project created",
+                project: "API Gateway Documentation",
+                time: "1 day ago",
+                details: "Generated from 3 repositories",
+                icon: FileText,
+              },
+            ].map((activity, index) => (
+              <div key={index} className="flex items-start gap-4 p-4 border rounded-lg">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <activity.icon className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="font-medium">{activity.action}</h4>
+                    <span className="text-sm text-slate-500">{activity.time}</span>
+                  </div>
+                  <p className="text-slate-600 text-sm mb-1">{activity.project}</p>
+                  <p className="text-slate-500 text-xs">{activity.details}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Projects Tab */}
       <Tabs defaultValue="projects" className="w-full">
         <TabsList>
           <TabsTrigger value="projects">Projects</TabsTrigger>
