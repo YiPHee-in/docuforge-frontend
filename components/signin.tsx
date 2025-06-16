@@ -73,6 +73,24 @@ export function SignIn() {
         provider: providerId as "github" | "gitlab" | "bitbucket" | "azure",
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          ...(providerId === "github" && {
+            scopes: "repo read:org",
+            queryParams: {
+              prompt: "consent",
+            },
+          }),
+          ...(providerId === "gitlab" && {
+            scopes: "read_repository read_user email",
+            queryParams: {
+              prompt: "consent",
+            },
+          }),
+          ...(providerId === "bitbucket" && {
+            scopes: "repository repository:write account team pullrequest",
+            queryParams: {
+              prompt: "consent",
+            },
+          }),
         },
       });
 

@@ -1,6 +1,3 @@
-"use client";
-
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,118 +31,71 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { PrismaClient } from "@/lib/generated/prisma";
+import { formatDistanceToNow } from "date-fns";
+import type { Prisma } from "@/lib/generated/prisma";
+import { ProjectSearch } from "./project-search";
+import { DashboardClient } from "./dashboard-client";
+import { DashboardHeader } from "./dashboard-header";
+import Link from "next/link";
+import type { Session } from "@supabase/supabase-js";
 
-export function Dashboard() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [userInfo, setUserInfo] = useState<any>(null);
+const prisma = new PrismaClient();
 
-  useEffect(() => {
-    const supabase = createClient();
+type ProjectWithVersions = Prisma.ProjectGetPayload<{
+  include: { versions: true };
+}>;
 
-    // Get the current session
-    const getSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-      if (error) {
-        console.error("Error getting session:", error.message);
-        return;
-      }
+type OrganizationWithProjects = Prisma.OrganizationGetPayload<{
+  include: { projects: { include: { versions: true } } };
+}>;
 
-      if (session) {
-        console.log("User session:", {
-          user: session.user,
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-          expires_at: new Date(session.expires_at! * 1000).toLocaleString(),
-        });
-        setUserInfo(session.user);
-      }
+type MembershipWithOrg = Prisma.OrganizationMemberGetPayload<{
+  include: {
+    organization: { include: { projects: { include: { versions: true } } } };
+  };
+}>;
+
+type UserWithMemberships = Prisma.UserGetPayload<{
+  include: {
+    memberships: {
+      include: {
+        organization: {
+          include: { projects: { include: { versions: true } } };
+        };
+      };
     };
+  };
+}>;
 
-    getSession();
+export type ProjectDisplay = {
+  id: string;
+  name: string;
+  description: string;
+  status: string;
+  lastUpdated: string;
+  url: string;
+  repositories: string[];
+  language: string;
+  lines: number;
+  webhookStatus: string;
+  views: number;
+  downloads: number;
+  latestVersion: ProjectWithVersions["versions"][0] | null;
+};
 
-    // Subscribe to auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        console.log("Auth state changed - Signed in:", {
-          user: session.user,
-          access_token: session.access_token,
-          refresh_token: session.refresh_token,
-          expires_at: new Date(session.expires_at! * 1000).toLocaleString(),
-        });
-        setUserInfo(session.user);
-      } else if (event === "SIGNED_OUT") {
-        console.log("Auth state changed - Signed out");
-        setUserInfo(null);
-      }
-    });
+interface DashboardProps {
+  projects: ProjectDisplay[];
+  stats: {
+    label: string;
+    value: string;
+    change: string;
+    icon: string;
+  }[];
+}
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const projects = [
-    {
-      id: "1",
-      name: "Legacy COBOL System",
-      description: "Main business application documentation",
-      status: "active",
-      lastUpdated: "2 hours ago",
-      url: "https://legacy-cobol-docs.pages.dev",
-      repositories: ["legacy-cobol-system", "cobol-utilities"],
-      language: "COBOL",
-      lines: 230000,
-      webhookStatus: "active",
-      views: 1247,
-      downloads: 89,
-    },
-    {
-      id: "2",
-      name: "API Gateway Documentation",
-      description: "Microservices API documentation",
-      status: "active",
-      lastUpdated: "1 day ago",
-      url: "https://api-gateway-docs.pages.dev",
-      repositories: ["api-gateway"],
-      language: "JavaScript",
-      lines: 15600,
-      webhookStatus: "active",
-      views: 892,
-      downloads: 34,
-    },
-    {
-      id: "3",
-      name: "Perl Data Processor",
-      description: "Legacy data transformation scripts",
-      status: "updating",
-      lastUpdated: "3 days ago",
-      url: "https://perl-processor-docs.pages.dev",
-      repositories: ["perl-data-processor"],
-      language: "Perl",
-      lines: 8900,
-      webhookStatus: "active",
-      views: 234,
-      downloads: 12,
-    },
-  ];
-
-  const stats = [
-    { label: "Total Projects", value: "12", change: "+2", icon: FileText },
-    {
-      label: "Documentation Views",
-      value: "8.2K",
-      change: "+15%",
-      icon: TrendingUp,
-    },
-    { label: "Active Webhooks", value: "9", change: "100%", icon: RefreshCw },
-    { label: "Team Members", value: "4", change: "+1", icon: Users },
-  ];
-
+// Server component for the main dashboard
+export async function Dashboard({ projects, stats }: DashboardProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
@@ -159,45 +109,52 @@ export function Dashboard() {
     }
   };
 
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "FileText":
+        return FileText;
+      case "TrendingUp":
+        return TrendingUp;
+      case "RefreshCw":
+        return RefreshCw;
+      case "Users":
+        return Users;
+      default:
+        return FileText;
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            Documentation Dashboard
-          </h1>
-          <p className="text-slate-600 mt-1">
-            Manage your AI-generated documentation projects
-          </p>
-        </div>
-        <Button onClick={() => (window.location.href = "/connect")}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Project
-        </Button>
-      </div>
+    <div className="p-8">
+      <DashboardHeader />
 
       {/* Stats Overview */}
       <div className="grid gap-6 md:grid-cols-4 mb-8">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-600">
-                    {stat.label}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-2xl font-bold">{stat.value}</span>
-                    <span className="text-sm text-green-600">
-                      {stat.change}
-                    </span>
+        {stats.map((stat, index) => {
+          const Icon = getIcon(stat.icon);
+          return (
+            <Card key={index}>
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-600">
+                      {stat.label}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-2xl font-bold">{stat.value}</span>
+                      {stat.change && (
+                        <span className="text-sm text-green-600">
+                          {stat.change}
+                        </span>
+                      )}
+                    </div>
                   </div>
+                  <Icon className="h-8 w-8 text-slate-400" />
                 </div>
-                <stat.icon className="h-8 w-8 text-slate-400" />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <Tabs defaultValue="projects" className="w-full">
@@ -217,95 +174,10 @@ export function Dashboard() {
                     Manage your generated documentation sites
                   </CardDescription>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <Input
-                      placeholder="Search projects..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 w-64"
-                    />
-                  </div>
-                  <Select defaultValue="all">
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="updating">Updating</SelectItem>
-                      <SelectItem value="error">Error</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {projects.map((project) => (
-                  <div
-                    key={project.id}
-                    className="border rounded-lg p-6 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h3 className="text-lg font-semibold">
-                            {project.name}
-                          </h3>
-                          {getStatusBadge(project.status)}
-                          <Badge variant="outline">{project.language}</Badge>
-                        </div>
-                        <p className="text-slate-600 mb-3">
-                          {project.description}
-                        </p>
-                        <div className="flex items-center gap-6 text-sm text-slate-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            Updated {project.lastUpdated}
-                          </span>
-                          <span>{project.lines.toLocaleString()} lines</span>
-                          <span>{project.views} views</span>
-                          <span>{project.downloads} downloads</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">
-                          <Globe className="mr-2 h-4 w-4" />
-                          View Site
-                          <ExternalLink className="ml-2 h-3 w-3" />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Download className="mr-2 h-4 w-4" />
-                          Download
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Settings className="mr-2 h-4 w-4" />
-                          Settings
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="text-slate-600">
-                          Repositories: {project.repositories.join(", ")}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-sm text-slate-500">
-                          <RefreshCw className="h-3 w-3" />
-                          Auto-sync: {project.webhookStatus}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <DashboardClient projects={projects} stats={stats} />
             </CardContent>
           </Card>
         </TabsContent>

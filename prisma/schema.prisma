@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  authUserId  String               @unique @map("auth_user_id") @db.Uuid
+  email       String?
+  name        String?
+  createdAt   DateTime             @default(now()) @map("created_at")
+  updatedAt   DateTime             @default(now()) @updatedAt @map("updated_at")
+  invitations Invitation[]
+  memberships OrganizationMember[]
+
+  @@map("users")
+}
+
+model Organization {
+  id               String               @id @default(uuid()) @db.Uuid
+  name             String
+  slug             String               @unique
+  plan             PlanType             @default(FREE)
+  stripeCustomerId String?              @unique @map("stripe_customer_id")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
+  invitations      Invitation[]
+  members          OrganizationMember[]
+  projects         Project[]
+
+  @@index([slug], map: "organization_slug_idx")
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String       @id @default(uuid()) @db.Uuid
+  role           MemberRole   @default(VIEWER)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  userId         String       @db.Uuid
+  organizationId String       @db.Uuid
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([userId, organizationId])
+  @@index([userId], map: "member_user_idx")
+  @@index([organizationId], map: "member_organization_idx")
+  @@map("organization_members")
+}
+
+model Project {
+  id             String            @id @default(uuid()) @db.Uuid
+  name           String
+  repoUrl        String?           @map("repo_url")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  organizationId String            @map("organizationId") @db.Uuid
+  versions       DocumentVersion[]
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId], map: "project_organization_idx")
+  @@map("projects")
+}
+
+model DocumentVersion {
+  id            String   @id @default(uuid()) @db.Uuid
+  versionNumber Int      @default(1) @map("version_number")
+  openapiSpec   Json?    @map("openapi_spec")
+  mermaidSpec   String?  @map("mermaid_spec")
+  contentHash   String   @map("content_hash")
+  createdAt     DateTime @default(now()) @map("created_at")
+  projectId     String   @db.Uuid
+  project       Project  @relation(fields: [projectId], references: [id])
+
+  @@map("document_versions")
+}
+
+model Invitation {
+  id             String       @id @default(uuid()) @db.Uuid
+  email          String
+  token          String       @unique
+  role           MemberRole   @default(VIEWER)
+  expiresAt      DateTime     @map("expires_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  organizationId String       @db.Uuid
+  invitedById    String       @db.Uuid
+  invitedBy      User         @relation(fields: [invitedById], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("invitations")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+
+model ProviderConnection {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  authUserId     String   @map("auth_user_id") @db.Uuid
+  provider       String   @map("provider")
+  accessToken    String   @map("access_token")
+  refreshToken   String?  @map("refresh_token")
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(6)
+  scopes         String[] @default([]) @map("scopes")
+  isActive       Boolean  @default(true) @map("is_active")
+  tokenExpiresAt DateTime @map("token_expires_at") @db.Timestamptz(6)
+
+  @@unique([authUserId, provider])
+  @@map("provider_connections")
+}
+
+enum PlanType {
+  FREE
+  STARTER
+  GROWTH
+  ENTERPRISE
+}
+
+enum MemberRole {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}

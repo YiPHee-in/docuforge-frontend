@@ -1,31 +1,30 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import "./globals.css"
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
+import type React from "react";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { ClientLayout } from "./client-layout";
+import { RootLayoutClient } from "./root-layout-client";
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "DocuForge - AI-Powered Documentation for Legacy Systems",
   description:
     "Transform legacy code into living documentation. Generate beautiful docs from COBOL, Perl, and 25+ languages in minutes.",
-    generator: 'v0.dev'
-}
+  generator: "v0.dev",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Header />
-        {children}
-        <Footer />
+      <body className={inter.className} suppressHydrationWarning>
+        <ClientLayout>
+          <RootLayoutClient>{children}</RootLayoutClient>
+        </ClientLayout>
       </body>
     </html>
-  )
+  );
 }
